@@ -57,6 +57,15 @@ def normalize_merchant(description: str) -> str:
 
 
 def title_case_merchant(value: str) -> str:
+    known_names = {
+        "amazon prime": "Amazon Prime",
+        "jiohotstar": "JioHotstar",
+        "netflix": "Netflix",
+        "spotify": "Spotify",
+    }
+    if value in known_names:
+        return known_names[value]
+
     return " ".join(part.capitalize() for part in value.split())
 
 
@@ -98,4 +107,3 @@ def guidance_for_app(app_name: str) -> str:
         app_name.lower(),
         f"Open {app_name}, find Autopay or UPI mandates in payment settings, and cancel the subscription.",
     )
-

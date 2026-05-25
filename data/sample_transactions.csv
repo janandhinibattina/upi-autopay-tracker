@@ -8,7 +8,9 @@ date,description,amount,upi_app,type
 2026-01-10,Amazon Prime UPI Mandate,299,Paytm,debit
 2026-02-10,Amazon Prime UPI Mandate,299,Paytm,debit
 2026-03-10,Amazon Prime UPI Mandate,299,Paytm,debit
+2026-01-12,JioHotstar Autopay,299,Google Pay,debit
+2026-02-12,JioHotstar Autopay,299,Google Pay,debit
+2026-03-12,JioHotstar Autopay,299,Google Pay,debit
 2026-03-12,College Canteen,85,Google Pay,debit
 2026-03-15,Friend Transfer,500,PhonePe,debit
 2026-03-18,Salary Credit,35000,Google Pay,credit
-

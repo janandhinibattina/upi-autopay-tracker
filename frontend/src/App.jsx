@@ -10,6 +10,14 @@ import {
   Upload,
   WalletCards,
 } from "lucide-react";
+import paylensLogo from "./assets/brand/paylens-logo.png";
+import gpayLogo from "./assets/logos/gpay.png";
+import hotstarLogo from "./assets/logos/jiohotstar.png";
+import netflixLogo from "./assets/logos/netflix.png";
+import paytmLogo from "./assets/logos/paytm.png";
+import phonepeLogo from "./assets/logos/phonepe.png";
+import primeLogo from "./assets/logos/prime-video.png";
+import spotifyLogo from "./assets/logos/spotify.png";
 
 const sampleSubscriptions = [
   {
@@ -31,6 +39,15 @@ const sampleSubscriptions = [
     cancellation_guidance: "Open Paytm > UPI & Payment Settings > Automatic Payments > Cancel mandate.",
   },
   {
+    name: "JioHotstar",
+    amount: 299,
+    frequency: "monthly",
+    upi_app: "Google Pay",
+    estimated_monthly_spend: 299,
+    occurrences: 3,
+    cancellation_guidance: "Open Google Pay > Profile > Autopay > Select mandate > Cancel.",
+  },
+  {
     name: "Spotify",
     amount: 119,
     frequency: "monthly",
@@ -46,6 +63,22 @@ const navItems = [
   { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
   { id: "guidance", label: "Cancel Guidance", icon: Ban },
 ];
+
+const APP_NAME = "PayLens";
+const APP_TAGLINE = "Unified UPI Autopay Manager";
+
+const serviceLogoAssets = {
+  hotstar: hotstarLogo,
+  netflix: netflixLogo,
+  prime: primeLogo,
+  spotify: spotifyLogo,
+};
+
+const paymentLogoAssets = {
+  gpay: gpayLogo,
+  paytm: paytmLogo,
+  phonepe: phonepeLogo,
+};
 
 export default function App() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -96,8 +129,13 @@ export default function App() {
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark">UP</div>
-          <span>UPI Autopay</span>
+          <span className="brand-logo-frame">
+            <img alt="PayLens logo" className="brand-logo" src={paylensLogo} />
+          </span>
+          <div>
+            <span>{APP_NAME}</span>
+            <small>{APP_TAGLINE}</small>
+          </div>
         </div>
 
         <nav className="nav-list" aria-label="Primary">
@@ -126,7 +164,7 @@ export default function App() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Unified tracker</p>
+            <p className="eyebrow">{APP_NAME}</p>
             <h1>{viewTitle(activeView)}</h1>
           </div>
           <label className="upload-button">
@@ -136,21 +174,23 @@ export default function App() {
           </label>
         </header>
 
-        {activeView === "dashboard" && (
-          <Dashboard
-            highestExpenseName={highestExpenseName}
-            message={message}
-            spendByApp={spendByApp}
-            subscriptions={subscriptions}
-            summary={summary}
-          />
-        )}
+        <div className="view-stage" key={activeView}>
+          {activeView === "dashboard" && (
+            <Dashboard
+              highestExpenseName={highestExpenseName}
+              message={message}
+              spendByApp={spendByApp}
+              subscriptions={subscriptions}
+              summary={summary}
+            />
+          )}
 
-        {activeView === "subscriptions" && (
-          <SubscriptionsView message={message} subscriptions={subscriptions} />
-        )}
+          {activeView === "subscriptions" && (
+            <SubscriptionsView message={message} subscriptions={subscriptions} />
+          )}
 
-        {activeView === "guidance" && <GuidanceView subscriptions={subscriptions} />}
+          {activeView === "guidance" && <GuidanceView subscriptions={subscriptions} />}
+        </div>
       </section>
     </main>
   );
@@ -172,8 +212,8 @@ function Dashboard({ highestExpenseName, message, spendByApp, subscriptions, sum
 
         <Panel title="UPI app split" meta="Monthly">
           <div className="app-spend-list">
-            {spendByApp.map((item) => (
-              <div className="app-spend-row" key={item.app}>
+            {spendByApp.map((item, index) => (
+              <div className="app-spend-row" key={item.app} style={{ "--delay": `${index * 70}ms` }}>
                 <AppBadge app={item.app} />
                 <strong>{formatMoney(item.total)}</strong>
               </div>
@@ -200,8 +240,12 @@ function SubscriptionsView({ message, subscriptions }) {
     <Panel title="Subscriptions" meta={`${subscriptions.length} active`} message={message}>
       <div className="subscription-card-grid">
         {subscriptions.length === 0 && <div className="empty-state">No recurring subscriptions detected in this CSV.</div>}
-        {subscriptions.map((subscription) => (
-          <article className="subscription-card" key={`${subscription.name}-${subscription.upi_app}`}>
+        {subscriptions.map((subscription, index) => (
+          <article
+            className="subscription-card"
+            key={`${subscription.name}-${subscription.upi_app}`}
+            style={{ "--delay": `${index * 75}ms` }}
+          >
             <ServiceLogo name={subscription.name} size="large" />
             <div className="subscription-card-main">
               <div>
@@ -227,8 +271,12 @@ function GuidanceView({ subscriptions }) {
     <Panel title="Cancel Guidance" meta={`${subscriptions.length} mandates`}>
       <div className="guidance-list">
         {subscriptions.length === 0 && <div className="empty-state">Upload a CSV to show mandate guidance.</div>}
-        {subscriptions.map((subscription) => (
-          <article className="guidance-item" key={`${subscription.name}-${subscription.upi_app}`}>
+        {subscriptions.map((subscription, index) => (
+          <article
+            className="guidance-item"
+            key={`${subscription.name}-${subscription.upi_app}`}
+            style={{ "--delay": `${index * 70}ms` }}
+          >
             <ServiceLogo name={subscription.name} />
             <div>
               <h2>{subscription.name}</h2>
@@ -252,8 +300,12 @@ function SubscriptionTable({ subscriptions, compact = false }) {
         <span>UPI app</span>
       </div>
       {subscriptions.length === 0 && <div className="empty-state">No recurring subscriptions detected in this CSV.</div>}
-      {subscriptions.map((subscription) => (
-        <div className={`table-row ${compact ? "compact" : ""}`} key={`${subscription.name}-${subscription.upi_app}`}>
+      {subscriptions.map((subscription, index) => (
+        <div
+          className={`table-row ${compact ? "compact" : ""}`}
+          key={`${subscription.name}-${subscription.upi_app}`}
+          style={{ "--delay": `${index * 55}ms` }}
+        >
           <div className="table-name">
             <ServiceLogo name={subscription.name} />
             <strong>{subscription.name}</strong>
@@ -300,10 +352,10 @@ function BarChart({ subscriptions }) {
 
   return (
     <div className="bar-chart">
-      {subscriptions.map((subscription) => {
+      {subscriptions.map((subscription, index) => {
         const width = Math.max((subscription.estimated_monthly_spend / max) * 100, 8);
         return (
-          <div className="bar-row" key={`${subscription.name}-bar`}>
+          <div className="bar-row" key={`${subscription.name}-bar`} style={{ "--delay": `${index * 90}ms` }}>
             <div className="bar-label">
               <ServiceLogo name={subscription.name} />
               <span>{subscription.name}</span>
@@ -351,7 +403,13 @@ function Metric({ icon, label, value }) {
 
 function ServiceLogo({ name, size = "regular" }) {
   const key = logoKey(name);
-  return <span className={`service-logo ${key} ${size}`}>{logoText(name)}</span>;
+  const logo = serviceLogoAssets[key];
+
+  return (
+    <span className={`service-logo ${key} ${size}`} aria-label={`${name} logo`} title={name}>
+      {logo ? <img alt="" src={logo} /> : logoText(name)}
+    </span>
+  );
 }
 
 function AppBadge({ app }) {
@@ -366,26 +424,9 @@ function AppBadge({ app }) {
 
 function PaymentLogo({ app }) {
   const key = appKey(app);
-  if (key === "gpay") {
-    return (
-      <span className="payment-logo gpay-mark" aria-hidden="true">
-        <span>G</span>
-      </span>
-    );
-  }
-  if (key === "phonepe") {
-    return (
-      <span className="payment-logo phonepe-mark" aria-hidden="true">
-        पे
-      </span>
-    );
-  }
-  if (key === "paytm") {
-    return (
-      <span className="payment-logo paytm-mark" aria-hidden="true">
-        P
-      </span>
-    );
+  const logo = paymentLogoAssets[key];
+  if (logo) {
+    return <img alt="" className={`payment-logo ${key}-mark`} src={logo} />;
   }
   return <span className="payment-logo default-mark" aria-hidden="true" />;
 }
@@ -430,15 +471,12 @@ function logoKey(name) {
   const value = name.toLowerCase();
   if (value.includes("netflix")) return "netflix";
   if (value.includes("spotify")) return "spotify";
+  if (value.includes("hotstar") || value.includes("jio")) return "hotstar";
   if (value.includes("amazon") || value.includes("prime")) return "prime";
   return "default";
 }
 
 function logoText(name) {
-  const value = name.toLowerCase();
-  if (value.includes("netflix")) return "NETFLIX";
-  if (value.includes("spotify")) return "Spotify";
-  if (value.includes("amazon") || value.includes("prime")) return "prime video";
   const parts = name.split(" ").filter(Boolean);
   if (parts.length === 1) {
     return parts[0].slice(0, 2).toUpperCase();
@@ -486,6 +524,7 @@ function chartColor(name, index) {
     netflix: "#e50914",
     spotify: "#1db954",
     prime: "#00a8e1",
+    hotstar: "#7b2ff7",
     default: ["#1f8a70", "#f6a821", "#5f259f", "#4285f4"][index % 4],
   };
   return colors[key] ?? colors.default;
