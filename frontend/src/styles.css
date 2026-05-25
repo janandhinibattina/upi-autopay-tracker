@@ -187,6 +187,13 @@ h2 {
   align-items: start;
 }
 
+.analytics-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
 .panel {
   overflow: hidden;
 }
@@ -337,31 +344,76 @@ h2 {
 }
 
 .service-logo {
-  display: grid;
+  display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 42px;
+  min-width: 42px;
   height: 42px;
   border-radius: 8px;
   color: #ffffff;
   font-size: 13px;
   font-weight: 900;
+  padding: 0 9px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .service-logo.netflix {
-  background: #e50914;
+  background: #111111;
+  color: #e50914;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 15px;
+  text-transform: uppercase;
 }
 
 .service-logo.spotify {
-  background: #1db954;
+  background: #191414;
+  color: #1db954;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .service-logo.prime {
-  background: #00a8e1;
+  position: relative;
+  background: #101820;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.service-logo.prime::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 32px;
+  height: 8px;
+  border-bottom: 2px solid #00a8e1;
+  border-radius: 50%;
 }
 
 .service-logo.default {
   background: #5b6f82;
+}
+
+.service-logo.large {
+  width: 100%;
+  min-height: 58px;
+  justify-self: start;
+  padding-inline: 14px;
+}
+
+.service-logo.large.netflix {
+  font-size: 22px;
+}
+
+.service-logo.large.spotify {
+  font-size: 20px;
+}
+
+.service-logo.large.prime {
+  font-size: 18px;
 }
 
 .app-badge {
@@ -378,28 +430,150 @@ h2 {
   font-weight: 800;
 }
 
-.app-dot {
-  width: 9px;
-  height: 9px;
+.payment-logo {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #5b6f82;
+  font-size: 11px;
+  font-weight: 900;
 }
 
-.app-badge.gpay .app-dot {
-  background: #4285f4;
+.gpay-mark {
+  background: conic-gradient(from 45deg, #4285f4 0 25%, #34a853 0 50%, #fbbc05 0 75%, #ea4335 0);
+  color: #ffffff;
+  font-family: Arial, sans-serif;
 }
 
-.app-badge.phonepe .app-dot {
+.phonepe-mark {
   background: #5f259f;
+  color: #ffffff;
 }
 
-.app-badge.paytm .app-dot {
-  background: #00baf2;
+.paytm-mark {
+  background: linear-gradient(90deg, #002e6e 0 50%, #00baf2 50%);
+  color: #ffffff;
+}
+
+.default-mark {
+  background: #5b6f82;
 }
 
 .empty-state {
   color: #526070;
   padding: 22px 20px;
+}
+
+.donut-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  padding: 22px 20px;
+}
+
+.donut-chart {
+  display: grid;
+  place-items: center;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+}
+
+.donut-hole {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #e6eee9;
+  text-align: center;
+}
+
+.donut-hole span {
+  color: #526070;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.donut-hole strong {
+  color: #10243f;
+  font-size: 16px;
+}
+
+.chart-legend {
+  display: grid;
+  gap: 10px;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  color: #344252;
+  font-size: 14px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.bar-chart {
+  display: grid;
+  gap: 16px;
+  padding: 22px 20px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(150px, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.bar-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bar-label span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8f0ec;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #1f8a70;
+}
+
+.bar-fill.netflix {
+  background: #e50914;
+}
+
+.bar-fill.spotify {
+  background: #1db954;
+}
+
+.bar-fill.prime {
+  background: #00a8e1;
 }
 
 .spin {
@@ -431,6 +605,7 @@ h2 {
   }
 
   .dashboard-grid,
+  .analytics-grid,
   .subscription-card-grid {
     grid-template-columns: 1fr;
   }
@@ -448,8 +623,14 @@ h2 {
   }
 
   .metrics,
-  .table-row {
+  .table-row,
+  .bar-row,
+  .donut-layout {
     grid-template-columns: 1fr;
+  }
+
+  .donut-chart {
+    margin-inline: auto;
   }
 
   .table-head {

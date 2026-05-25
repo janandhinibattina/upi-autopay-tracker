@@ -7,7 +7,6 @@ import {
   IndianRupee,
   LayoutDashboard,
   Loader2,
-  ShieldCheck,
   Upload,
   WalletCards,
 } from "lucide-react";
@@ -182,6 +181,16 @@ function Dashboard({ highestExpenseName, message, spendByApp, subscriptions, sum
           </div>
         </Panel>
       </section>
+
+      <section className="analytics-grid">
+        <Panel title="Spend distribution" meta="By subscription">
+          <DonutChart subscriptions={subscriptions} />
+        </Panel>
+
+        <Panel title="Monthly comparison" meta="Recurring value">
+          <BarChart subscriptions={subscriptions} />
+        </Panel>
+      </section>
     </>
   );
 }
@@ -193,7 +202,7 @@ function SubscriptionsView({ message, subscriptions }) {
         {subscriptions.length === 0 && <div className="empty-state">No recurring subscriptions detected in this CSV.</div>}
         {subscriptions.map((subscription) => (
           <article className="subscription-card" key={`${subscription.name}-${subscription.upi_app}`}>
-            <ServiceLogo name={subscription.name} />
+            <ServiceLogo name={subscription.name} size="large" />
             <div className="subscription-card-main">
               <div>
                 <h2>{subscription.name}</h2>
@@ -258,6 +267,61 @@ function SubscriptionTable({ subscriptions, compact = false }) {
   );
 }
 
+function DonutChart({ subscriptions }) {
+  const total = subscriptions.reduce((sum, item) => sum + item.estimated_monthly_spend, 0);
+  const segments = buildSegments(subscriptions, total);
+  const background = segments.length
+    ? `conic-gradient(${segments.map((segment) => `${segment.color} ${segment.start}% ${segment.end}%`).join(", ")})`
+    : "#dce7e2";
+
+  return (
+    <div className="donut-layout">
+      <div className="donut-chart" style={{ background }}>
+        <div className="donut-hole">
+          <span>Total</span>
+          <strong>{formatMoney(total)}</strong>
+        </div>
+      </div>
+      <div className="chart-legend">
+        {segments.map((segment) => (
+          <div className="legend-row" key={segment.name}>
+            <span className="legend-color" style={{ background: segment.color }} />
+            <span>{segment.name}</span>
+            <strong>{segment.percent}%</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BarChart({ subscriptions }) {
+  const max = Math.max(...subscriptions.map((item) => item.estimated_monthly_spend), 1);
+
+  return (
+    <div className="bar-chart">
+      {subscriptions.map((subscription) => {
+        const width = Math.max((subscription.estimated_monthly_spend / max) * 100, 8);
+        return (
+          <div className="bar-row" key={`${subscription.name}-bar`}>
+            <div className="bar-label">
+              <ServiceLogo name={subscription.name} />
+              <span>{subscription.name}</span>
+            </div>
+            <div className="bar-track" aria-label={`${subscription.name} monthly spend`}>
+              <span
+                className={`bar-fill ${logoKey(subscription.name)}`}
+                style={{ width: `${width}%` }}
+              />
+            </div>
+            <strong>{formatMoney(subscription.estimated_monthly_spend)}</strong>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Panel({ children, message, meta, title }) {
   return (
     <section className="panel">
@@ -285,19 +349,45 @@ function Metric({ icon, label, value }) {
   );
 }
 
-function ServiceLogo({ name }) {
+function ServiceLogo({ name, size = "regular" }) {
   const key = logoKey(name);
-  return <span className={`service-logo ${key}`}>{logoText(name)}</span>;
+  return <span className={`service-logo ${key} ${size}`}>{logoText(name)}</span>;
 }
 
 function AppBadge({ app }) {
   const key = appKey(app);
   return (
     <span className={`app-badge ${key}`}>
-      <span className="app-dot" />
+      <PaymentLogo app={app} />
       {app}
     </span>
   );
+}
+
+function PaymentLogo({ app }) {
+  const key = appKey(app);
+  if (key === "gpay") {
+    return (
+      <span className="payment-logo gpay-mark" aria-hidden="true">
+        <span>G</span>
+      </span>
+    );
+  }
+  if (key === "phonepe") {
+    return (
+      <span className="payment-logo phonepe-mark" aria-hidden="true">
+        पे
+      </span>
+    );
+  }
+  if (key === "paytm") {
+    return (
+      <span className="payment-logo paytm-mark" aria-hidden="true">
+        P
+      </span>
+    );
+  }
+  return <span className="payment-logo default-mark" aria-hidden="true" />;
 }
 
 function createSummary(subscriptions) {
@@ -345,6 +435,10 @@ function logoKey(name) {
 }
 
 function logoText(name) {
+  const value = name.toLowerCase();
+  if (value.includes("netflix")) return "NETFLIX";
+  if (value.includes("spotify")) return "Spotify";
+  if (value.includes("amazon") || value.includes("prime")) return "prime video";
   const parts = name.split(" ").filter(Boolean);
   if (parts.length === 1) {
     return parts[0].slice(0, 2).toUpperCase();
@@ -366,4 +460,33 @@ function appKey(app) {
 
 function defaultGuidance(app) {
   return `Open ${app}, go to Autopay or UPI mandates, select the subscription, and cancel the mandate.`;
+}
+
+function buildSegments(subscriptions, total) {
+  let cursor = 0;
+  return subscriptions.map((subscription, index) => {
+    const percent = total > 0 ? Math.round((subscription.estimated_monthly_spend / total) * 100) : 0;
+    const start = cursor;
+    const end = cursor + (total > 0 ? (subscription.estimated_monthly_spend / total) * 100 : 0);
+    cursor = end;
+
+    return {
+      name: subscription.name,
+      percent,
+      start,
+      end,
+      color: chartColor(subscription.name, index),
+    };
+  });
+}
+
+function chartColor(name, index) {
+  const key = logoKey(name);
+  const colors = {
+    netflix: "#e50914",
+    spotify: "#1db954",
+    prime: "#00a8e1",
+    default: ["#1f8a70", "#f6a821", "#5f259f", "#4285f4"][index % 4],
+  };
+  return colors[key] ?? colors.default;
 }
